@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './index.css'
 import Analytics from './Analytics.jsx'
+import { useSync } from './useSync.js'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -466,9 +467,22 @@ export default function App() {
   const [month, setMonth] = useState(today.getMonth())
   const [tab, setTab] = useState('overview')
 
-  const [allTx, setAllTx]         = useLocalStorage('budget_tx', {})
-  const [allBudgets, setAllBudgets] = useLocalStorage('budget_limits', {})
-  const [plannedSavings, setPlannedSavings] = useLocalStorage('budget_planned_savings', 0)
+  const { data, update, synced, online } = useSync()
+  const allTx          = data.transactions
+  const allBudgets     = data.budgets
+  const plannedSavings = data.plannedSavings
+
+  const setAllTx = (fn) => {
+    const next = typeof fn === 'function' ? fn(data.transactions) : fn
+    update({ ...data, transactions: next })
+  }
+  const setAllBudgets = (fn) => {
+    const next = typeof fn === 'function' ? fn(data.budgets) : fn
+    update({ ...data, budgets: next })
+  }
+  const setPlannedSavings = (val) => {
+    update({ ...data, plannedSavings: val })
+  }
 
   const [showAddTx, setShowAddTx]           = useState(false)
   const [showBudgetSetup, setShowBudgetSetup] = useState(false)
@@ -511,10 +525,16 @@ export default function App() {
           <h1>💑 Our Budget</h1>
           <p>Track your finances together</p>
         </div>
-        <div className="month-nav">
-          <button onClick={prevMonth}>‹</button>
-          <span>{MONTHS[month]} {year}</span>
-          <button onClick={nextMonth}>›</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 5, opacity: 0.85 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: !synced ? '#fbbf24' : online ? '#4ade80' : '#f87171', display: 'inline-block' }} />
+            {!synced ? 'Connecting…' : online ? 'Synced' : 'Offline'}
+          </div>
+          <div className="month-nav">
+            <button onClick={prevMonth}>‹</button>
+            <span>{MONTHS[month]} {year}</span>
+            <button onClick={nextMonth}>›</button>
+          </div>
         </div>
       </header>
 
