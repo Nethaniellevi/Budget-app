@@ -518,6 +518,14 @@ export default function App() {
     dayOfMonth, totalDays, isCurrentMonth,
   })
 
+  const NAV_ITEMS = [
+    { id: 'overview',      icon: '🏠', label: 'Budget' },
+    { id: 'insights',      icon: '💡', label: 'Insights' },
+    { id: 'analytics',     icon: '📊', label: 'Charts' },
+    { id: 'transactions',  icon: '🧾', label: 'Expenses' },
+    { id: 'income',        icon: '💵', label: 'Income' },
+  ]
+
   return (
     <div className="app">
       <header className="header">
@@ -525,10 +533,10 @@ export default function App() {
           <h1>💑 Our Budget</h1>
           <p>Track your finances together</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: 5, opacity: 0.85 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: 5, opacity: 0.85 }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: !synced ? '#fbbf24' : online ? '#4ade80' : '#f87171', display: 'inline-block' }} />
-            {!synced ? 'Connecting…' : online ? 'Synced' : 'Offline'}
+            <span style={{ display: 'none' }} className="sync-label">{!synced ? 'Connecting…' : online ? 'Synced' : 'Offline'}</span>
           </div>
           <div className="month-nav">
             <button onClick={prevMonth}>‹</button>
@@ -721,6 +729,23 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* FAB — mobile only, adds expense */}
+      <button className="fab" onClick={() => { setDefaultTxType('expense'); setShowAddTx(true) }}>+</button>
+
+      {/* Bottom nav — mobile only */}
+      <nav className="bottom-nav">
+        {NAV_ITEMS.map(item => (
+          <button
+            key={item.id}
+            className={`bottom-nav-item ${tab === item.id ? 'active' : ''}`}
+            onClick={() => setTab(item.id)}
+          >
+            <span className="nav-icon">{item.icon}</span>
+            {item.label}
+          </button>
+        ))}
+      </nav>
 
       {showAddTx && (
         <AddTransactionModal defaultType={defaultTxType} onSave={addTx} onClose={() => setShowAddTx(false)} />
