@@ -473,15 +473,19 @@ export default function App() {
   const plannedSavings = data.plannedSavings
 
   const setAllTx = (fn) => {
-    const next = typeof fn === 'function' ? fn(data.transactions) : fn
-    update({ ...data, transactions: next })
+    update(prev => {
+      const next = typeof fn === 'function' ? fn(prev.transactions) : fn
+      return { ...prev, transactions: next }
+    })
   }
   const setAllBudgets = (fn) => {
-    const next = typeof fn === 'function' ? fn(data.budgets) : fn
-    update({ ...data, budgets: next })
+    update(prev => {
+      const next = typeof fn === 'function' ? fn(prev.budgets) : fn
+      return { ...prev, budgets: next }
+    })
   }
   const setPlannedSavings = (val) => {
-    update({ ...data, plannedSavings: val })
+    update(prev => ({ ...prev, plannedSavings: val }))
   }
 
   const [showAddTx, setShowAddTx]           = useState(false)
